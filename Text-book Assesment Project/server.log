@@ -1,0 +1,13 @@
+[Mon Mar 16 01:50:03 2026] PHP 8.1.2-1ubuntu2.23 Development Server (http://localhost:8080) started
+[Mon Mar 16 01:50:10 2026] 127.0.0.1:40792 Accepted
+[Mon Mar 16 01:50:11 2026] 127.0.0.1:40792 [200]: GET /index.php
+[Mon Mar 16 01:50:11 2026] 127.0.0.1:40792 Closing
+[Mon Mar 16 01:51:15 2026] 127.0.0.1:51454 Accepted
+[Mon Mar 16 01:51:17 2026] 127.0.0.1:51454 [200]: GET /index.php
+[Mon Mar 16 01:51:17 2026] 127.0.0.1:51454 Closing
+[Mon Mar 16 01:53:35 2026] 127.0.0.1:55630 Accepted
+[Mon Mar 16 01:53:37 2026] 127.0.0.1:55630 [200]: GET /index.php
+[Mon Mar 16 01:53:37 2026] 127.0.0.1:55630 Closing
+[Mon Mar 16 01:53:49 2026] 127.0.0.1:58700 Accepted
+[Mon Mar 16 01:53:49 2026] 127.0.0.1:58700 [200]: GET /test_db.php
+[Mon Mar 16 01:53:49 2026] 127.0.0.1:58700 Closing

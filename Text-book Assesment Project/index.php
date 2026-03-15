@@ -7,7 +7,7 @@ require_once 'includes/google_books.php';
 $googleBooks = new GoogleBooksAPI(GOOGLE_BOOKS_API_KEY);
 
 // Get featured books
-$featuredBooks = $googleBooks->getFeaturedBooks(3);
+$featuredBooks = $googleBooks->getFeaturedBooks(6);
 ?>
 
 <style>
@@ -21,6 +21,15 @@ $featuredBooks = $googleBooks->getFeaturedBooks(3);
     .fade-in.visible {
         opacity: 1;
         transform: translateY(0);
+    }
+
+    /* Ensure visibility for browsers where IntersectionObserver may not trigger */
+    .no-js .fade-in,
+    .no-js .slide-in-left,
+    .no-js .slide-in-right,
+    .no-js .scale-up {
+        opacity: 1;
+        transform: none;
     }
 
     .slide-in-left {
@@ -108,6 +117,16 @@ $featuredBooks = $googleBooks->getFeaturedBooks(3);
         }
     }
 </style>
+
+<script>
+// Make everything visible immediately as a fallback, then animate on scroll
+document.addEventListener('DOMContentLoaded', function() {
+    // Force all animated elements to be visible immediately
+    document.querySelectorAll('.fade-in, .slide-in-left, .slide-in-right, .scale-up').forEach(function(el) {
+        el.classList.add('visible');
+    });
+});
+</script>
 
 <main class="pt-0">
     <!-- Navigation Bar -->

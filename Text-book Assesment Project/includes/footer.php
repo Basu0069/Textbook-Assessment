@@ -18,11 +18,11 @@
                 <ul class="space-y-2">
                     <li class="text-gray-400">
                         <i class="fas fa-phone mr-2"></i>
-                        <a href="tel:9346297136" class="hover:text-white transition duration-200">9346297136</a>
+                        <a href="tel:6006782834" class="hover:text-white transition duration-200">6006782834</a>
                     </li>
                     <li class="text-gray-400">
                         <i class="fas fa-envelope mr-2"></i>
-                        <a href="mailto:divyansht233@gmail.com" class="hover:text-white transition duration-200">divyansht233@gmail.com</a>
+                        <a href="mailto:basuslathia01@gmail.com" class="hover:text-white transition duration-200">basuslathia01@gmail.com</a>
                     </li>
                 </ul>
             </div>

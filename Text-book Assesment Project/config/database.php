@@ -1,8 +1,8 @@
 <?php
 // Database configuration
 define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_USER', 'textbook_user');
+define('DB_PASS', 'Witch@69');
 define('DB_NAME', 'textbook_assessment');
 
 try {
