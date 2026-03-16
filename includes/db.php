@@ -6,44 +6,46 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
     // First, check if users table exists
-    $usersTableExists = $pdo->query("SHOW TABLES LIKE 'users'")->rowCount() > 0;
+    $usersTableExists = $pdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")->rowCount() > 0;
     
     // If users table doesn't exist, create it
     if (!$usersTableExists) {
-        $pdo->exec("CREATE TABLE users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(100) NOT NULL,
-            email VARCHAR(100) NOT NULL UNIQUE,
-            password VARCHAR(255) NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )");
+        $sql = "CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )";
+        $pdo->exec($sql);
     }
     
     // Check if reviews table exists
-    $reviewsTableExists = $pdo->query("SHOW TABLES LIKE 'reviews'")->rowCount() > 0;
+    $reviewsTableExists = $pdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name='reviews'")->rowCount() > 0;
     
     // If reviews table doesn't exist, create it
     if (!$reviewsTableExists) {
-        $pdo->exec("CREATE TABLE reviews (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            book_id VARCHAR(255) NOT NULL,
-            user_id INT NOT NULL,
-            content_quality INT NOT NULL CHECK (content_quality BETWEEN 1 AND 5),
-            explanation_clarity INT NOT NULL CHECK (explanation_clarity BETWEEN 1 AND 5),
-            examples_quality INT NOT NULL CHECK (examples_quality BETWEEN 1 AND 5),
-            exercises_quality INT NOT NULL CHECK (exercises_quality BETWEEN 1 AND 5),
-            language_clarity INT NOT NULL CHECK (language_clarity BETWEEN 1 AND 5),
-            average_rating DECIMAL(3,1) NOT NULL,
+        $sql = "CREATE TABLE IF NOT EXISTS reviews (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            book_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL,
+            content_quality INTEGER NOT NULL CHECK (content_quality BETWEEN 1 AND 5),
+            explanation_clarity INTEGER NOT NULL CHECK (explanation_clarity BETWEEN 1 AND 5),
+            examples_quality INTEGER NOT NULL CHECK (examples_quality BETWEEN 1 AND 5),
+            exercises_quality INTEGER NOT NULL CHECK (exercises_quality BETWEEN 1 AND 5),
+            language_clarity INTEGER NOT NULL CHECK (language_clarity BETWEEN 1 AND 5),
+            average_rating REAL NOT NULL,
             comments TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            INDEX idx_book_id (book_id),
-            INDEX idx_user_id (user_id),
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-        )");
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (book_id) REFERENCES books(book_id),
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        );
+        CREATE INDEX IF NOT EXISTS idx_book_id ON reviews(book_id);";
+        $pdo->exec($sql);
     }
 
     // Verify tables exist
-    $tables = $pdo->query("SHOW TABLES")->fetchAll(PDO::FETCH_COLUMN);
+    $tables = $pdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")->fetchAll(PDO::FETCH_COLUMN);
     if (!in_array('users', $tables)) {
         throw new Exception("Users table was not created successfully");
     }
