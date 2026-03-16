@@ -1,13 +1,10 @@
 <?php
-// Initialize session first thing
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-// db.php includes config.php which has no whitespace now
+// START: No whitespace, no BOM, nothing before this tag
+// All logic runs FIRST - before any HTML is ever included or echoed
+session_start();
 require_once 'includes/db.php';
 
 $error = '';
-$success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
@@ -23,8 +20,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Password must be at least 6 characters long';
     } else {
         try {
-            if (!$pdo) throw new Exception("Database connection failed");
-
             $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
             $stmt->execute([$email]);
             if ($stmt->fetch()) {
@@ -32,36 +27,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
                 $stmt = $pdo->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
-                
-                if (!$stmt->execute([$name, $email, $hashedPassword])) {
-                    throw new Exception("Failed to insert user data");
-                }
-                
+                $stmt->execute([$name, $email, $hashedPassword]);
                 $userId = $pdo->lastInsertId();
+
                 $_SESSION['user_id'] = $userId;
                 $_SESSION['user_name'] = $name;
-                
-                // Pure JS redirect to bypass ANY PHP header bugs, immediately exit script so no HTML renders
-                echo '<html><body><script>window.location.href = "index.php";</script></body></html>';
-                exit;
+
+                // Clean 302 redirect - this works because NO HTML has been output yet
+                header('Location: index.php');
+                exit();
             }
         } catch (Exception $e) {
             $error = 'Error: ' . $e->getMessage();
         }
     }
 }
-
-// Only include the heavy HTML header AFTER all redirect logic has safely finished or failed
+// Past this point, we know we are NOT redirecting, so it is safe to output HTML
 require_once 'includes/header.php';
-?>
-
-// Display any errors
-if ($error) {
-    echo '<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-            <strong class="font-bold">Error!</strong>
-            <span class="block sm:inline">' . htmlspecialchars($error) . '</span>
-          </div>';
-}
 ?>
 
 <main class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -71,16 +53,10 @@ if ($error) {
                 Create your account
             </h2>
         </div>
-        
+
         <?php if ($error): ?>
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
                 <span class="block sm:inline"><?php echo htmlspecialchars($error); ?></span>
-            </div>
-        <?php endif; ?>
-
-        <?php if ($success): ?>
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-                <span class="block sm:inline"><?php echo htmlspecialchars($success); ?></span>
             </div>
         <?php endif; ?>
 
@@ -88,54 +64,54 @@ if ($error) {
             <div class="rounded-md shadow-sm -space-y-px">
                 <div>
                     <label for="name" class="sr-only">Full Name</label>
-                    <input id="name" name="name" type="text" required 
-                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 
-                                  placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-t-md 
-                                  focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm 
+                    <input id="name" name="name" type="text" required
+                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600
+                                  placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-t-md
+                                  focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm
                                   bg-white dark:bg-gray-700"
                            placeholder="Full Name">
                 </div>
                 <div>
                     <label for="email" class="sr-only">Email address</label>
-                    <input id="email" name="email" type="email" required 
-                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 
-                                  placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white 
-                                  focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm 
+                    <input id="email" name="email" type="email" required
+                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600
+                                  placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white
+                                  focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm
                                   bg-white dark:bg-gray-700"
                            placeholder="Email address">
                 </div>
                 <div>
                     <label for="password" class="sr-only">Password</label>
-                    <input id="password" name="password" type="password" required 
-                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 
-                                  placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white 
-                                  focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm 
+                    <input id="password" name="password" type="password" required
+                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600
+                                  placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white
+                                  focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm
                                   bg-white dark:bg-gray-700"
                            placeholder="Password">
                 </div>
                 <div>
                     <label for="confirm_password" class="sr-only">Confirm Password</label>
-                    <input id="confirm_password" name="confirm_password" type="password" required 
-                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 
-                                  placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-b-md 
-                                  focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm 
+                    <input id="confirm_password" name="confirm_password" type="password" required
+                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600
+                                  placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-b-md
+                                  focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm
                                   bg-white dark:bg-gray-700"
                            placeholder="Confirm Password">
                 </div>
             </div>
 
             <div>
-                <button type="submit" 
-                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium 
-                               rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 
+                <button type="submit"
+                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium
+                               rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2
                                focus:ring-offset-2 focus:ring-blue-500">
                     Sign up
                 </button>
             </div>
-            
+
             <div class="text-center">
                 <p class="text-sm text-gray-600 dark:text-gray-400">
-                    Already have an account? 
+                    Already have an account?
                     <a href="login.php" class="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
                         Sign in
                     </a>
@@ -145,4 +121,4 @@ if ($error) {
     </div>
 </main>
 
-<?php require_once 'includes/footer.php'; ?> 
+<?php require_once 'includes/footer.php'; ?>

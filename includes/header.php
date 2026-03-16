@@ -1,5 +1,4 @@
 <?php
-ob_start();
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -78,4 +77,4 @@ if (session_status() === PHP_SESSION_NONE) {
     <!-- Main Content Wrapper -->
     <div class="main-content">
 </body>
-</html> 
+</html>
