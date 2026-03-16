@@ -9,7 +9,6 @@ ini_set('display_errors', 1);
 // Time Zone
 date_default_timezone_set('UTC');
 
-// Define DB_DSN if not already defined (e.g., by config.php)
 if (!defined('DB_DSN')) {
     define('DB_FILE', __DIR__ . '/database.sqlite');
     define('DB_DSN', 'sqlite:' . DB_FILE);

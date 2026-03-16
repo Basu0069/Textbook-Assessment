@@ -7,9 +7,13 @@ if ($conn) {
     // SQLite equivalent of SHOW TABLES
     $stmt = $conn->query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
     
-    echo "<strong>Tables in DB:</strong><br>";
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        echo $row['name'] . "<br>";
+    echo "<br><strong>Database Structure Check:</strong><br>";
+    // Check if 'users' table exists
+    $usersTableExists = $conn->query("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")->rowCount() > 0;
+    if ($usersTableExists) {
+        echo "✅ 'users' table found.<br>";
+    } else {
+        echo "❌ 'users' table not found.<br>";
     }
 } else {
     echo "❌ Database connection failed.";
