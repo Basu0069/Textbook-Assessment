@@ -1,7 +1,9 @@
 <?php
+// Initialize session first thing
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+// db.php includes config.php which has no whitespace now
 require_once 'includes/db.php';
 
 $error = '';
@@ -13,9 +15,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirm_password'] ?? '';
 
-    // Debug: Print received form data
-    error_log("Signup attempt - Name: $name, Email: $email");
-
     if (empty($name) || empty($email) || empty($password) || empty($confirmPassword)) {
         $error = 'Please fill in all fields';
     } elseif ($password !== $confirmPassword) {
@@ -24,64 +23,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Password must be at least 6 characters long';
     } else {
         try {
-            // Verify database connection
-            if (!$pdo) {
-                throw new Exception("Database connection failed");
-            }
+            if (!$pdo) throw new Exception("Database connection failed");
 
-            // Check if email already exists
             $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
             $stmt->execute([$email]);
             if ($stmt->fetch()) {
                 $error = 'Email already registered';
             } else {
-                // Create new user
                 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-                
-                // Debug: Print SQL and parameters
-                error_log("Attempting to insert user - Name: $name, Email: $email");
-                
                 $stmt = $pdo->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
-                $result = $stmt->execute([$name, $email, $hashedPassword]);
                 
-                if (!$result) {
+                if (!$stmt->execute([$name, $email, $hashedPassword])) {
                     throw new Exception("Failed to insert user data");
                 }
                 
-                // Get the newly created user's ID
                 $userId = $pdo->lastInsertId();
-                error_log("User created successfully with ID: $userId");
-                
-                // Verify the user was created
-                $verifyStmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
-                $verifyStmt->execute([$userId]);
-                $user = $verifyStmt->fetch();
-                
-                if (!$user) {
-                    throw new Exception("User creation verification failed");
-                }
-                
-                // Set session variables
                 $_SESSION['user_id'] = $userId;
                 $_SESSION['user_name'] = $name;
                 
-                error_log("Session variables set - User ID: $userId, Name: $name");
-                
-                // Redirect to home page using JS to bypass any output buffering issues
-                echo '<script>window.location.href = "index.php";</script>';
+                // Pure JS redirect to bypass ANY PHP header bugs, immediately exit script so no HTML renders
+                echo '<html><body><script>window.location.href = "index.php";</script></body></html>';
                 exit;
             }
-        } catch (PDOException $e) {
-            error_log("Database error during signup: " . $e->getMessage());
-            $error = 'Database error: ' . $e->getMessage();
         } catch (Exception $e) {
-            error_log("Error during signup: " . $e->getMessage());
             $error = 'Error: ' . $e->getMessage();
         }
     }
 }
 
+// Only include the heavy HTML header AFTER all redirect logic has safely finished or failed
 require_once 'includes/header.php';
+?>
 
 // Display any errors
 if ($error) {

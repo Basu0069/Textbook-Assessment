@@ -1,7 +1,9 @@
 <?php
+// Initialize session first thing
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+// db.php includes config.php which has no whitespace now
 require_once 'includes/db.php';
 
 $error = '';
@@ -21,18 +23,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($user && password_verify($password, $user['password'])) {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['name'];
-                // Redirect to home page using JS to bypass any output buffering issues
-                echo '<script>window.location.href = "index.php";</script>';
+                
+                // Pure JS redirect to bypass ANY PHP header bugs, immediately exit
+                echo '<html><body><script>window.location.href = "index.php";</script></body></html>';
                 exit;
             } else {
                 $error = 'Invalid email or password';
             }
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             $error = 'Database error: ' . $e->getMessage();
         }
     }
 }
 
+// Only include the heavy HTML header AFTER all redirect logic has safely finished or failed
 require_once 'includes/header.php';
 ?>
 
