@@ -1,12 +1,12 @@
 <?php
 // Database configuration
 define('DB_HOST', 'localhost');
-define('DB_USER', 'textbook_user');
-define('DB_PASS', 'Witch@69');
-define('DB_NAME', 'textbook_assessment');
-
+if (!defined('DB_DSN')) {
+    define('DB_FILE', __DIR__ . '/../database.sqlite');
+    define('DB_DSN', 'sqlite:' . DB_FILE);
+}
 try {
-    $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USER, DB_PASS);
+    $pdo = new PDO(DB_DSN);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch(PDOException $e) {
     die("Connection failed: " . $e->getMessage());

@@ -3,7 +3,7 @@ require_once 'includes/config.php';
 
 try {
     // Test database connection
-    $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USER, DB_PASS);
+    $pdo = new PDO(DB_DSN);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     echo "Database connection successful!<br>";
 

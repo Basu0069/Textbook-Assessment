@@ -9,9 +9,13 @@ ini_set('display_errors', 1);
 // Time Zone
 date_default_timezone_set('UTC');
 
-
+// Define DB_DSN if not already defined (e.g., by config.php)
+if (!defined('DB_DSN')) {
+    define('DB_FILE', __DIR__ . '/database.sqlite');
+    define('DB_DSN', 'sqlite:' . DB_FILE);
+}
 try {
-    $conn = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USER, DB_PASS);
+    $conn = new PDO(DB_DSN);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch(PDOException $e) {
     die("Connection failed: " . $e->getMessage());

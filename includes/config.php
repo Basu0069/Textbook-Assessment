@@ -3,13 +3,10 @@
 if (!defined('CONFIG_LOADED')) {
     define('CONFIG_LOADED', true);
 
-    // Database configuration
-    // On Render: set these as Environment Variables in the dashboard
-    // Locally: falls back to your local credentials
-    if (!defined('DB_HOST')) define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
-    if (!defined('DB_NAME')) define('DB_NAME', getenv('DB_NAME') ?: 'textbook_assessment');
-    if (!defined('DB_USER')) define('DB_USER', getenv('DB_USER') ?: 'textbook_user');
-    if (!defined('DB_PASS')) define('DB_PASS', getenv('DB_PASS') ?: 'Witch@69');
+    // Database configuration for SQLite
+    define('DB_FILE', __DIR__ . '/../database.sqlite');
+    // For PDO connection string
+    define('DB_DSN', 'sqlite:' . DB_FILE);
 
     // Google Books API configuration
     if (!defined('GOOGLE_BOOKS_API_KEY')) define('GOOGLE_BOOKS_API_KEY', getenv('GOOGLE_BOOKS_API_KEY') ?: 'YOUR_GOOGLE_BOOKS_API_KEY');
@@ -23,4 +20,3 @@ if (!defined('CONFIG_LOADED')) {
         session_start();
     }
 }
- 
