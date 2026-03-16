@@ -1,5 +1,7 @@
 <?php
-require_once 'includes/header.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once 'includes/db.php';
 
 $error = '';
@@ -29,6 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
+require_once 'includes/header.php';
 ?>
 
 <main class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
