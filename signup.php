@@ -1,51 +1,9 @@
 <?php
-// START: No whitespace, no BOM, nothing before this tag
-// All logic runs FIRST - before any HTML is ever included or echoed
 session_start();
-require_once 'includes/db.php';
-
-$error = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = trim($_POST['name'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $password = $_POST['password'] ?? '';
-    $confirmPassword = $_POST['confirm_password'] ?? '';
-
-    if (empty($name) || empty($email) || empty($password) || empty($confirmPassword)) {
-        $error = 'Please fill in all fields';
-    } elseif ($password !== $confirmPassword) {
-        $error = 'Passwords do not match';
-    } elseif (strlen($password) < 6) {
-        $error = 'Password must be at least 6 characters long';
-    } else {
-        try {
-            $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
-            $stmt->execute([$email]);
-            if ($stmt->fetch()) {
-                $error = 'Email already registered';
-            } else {
-                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-                $stmt = $pdo->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
-                $stmt->execute([$name, $email, $hashedPassword]);
-                $userId = $pdo->lastInsertId();
-
-                $_SESSION['user_id'] = $userId;
-                $_SESSION['user_name'] = $name;
-
-                // Clean 302 redirect - this works because NO HTML has been output yet
-                header('Location: index.php');
-                exit();
-            }
-        } catch (Exception $e) {
-            $error = 'Error: ' . $e->getMessage();
-        }
-    }
-}
-// Past this point, we know we are NOT redirecting, so it is safe to output HTML
 require_once 'includes/header.php';
+$error = $_GET['error'] ?? '';
+$success = $_GET['success'] ?? '';
 ?>
-
 <main class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
         <div>
@@ -60,7 +18,7 @@ require_once 'includes/header.php';
             </div>
         <?php endif; ?>
 
-        <form class="mt-8 space-y-6" method="POST">
+        <form class="mt-8 space-y-6" method="POST" action="auth_signup.php">
             <div class="rounded-md shadow-sm -space-y-px">
                 <div>
                     <label for="name" class="sr-only">Full Name</label>
