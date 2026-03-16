@@ -1,8 +1,8 @@
 # Use PHP 8.1 with Apache web server
 FROM php:8.1-apache
 
-# Install PHP extensions needed for MySQL/PDO
-RUN docker-php-ext-install pdo pdo_mysql mysqli
+# Install PHP extensions needed for SQLite and MySQL/PDO fallback
+RUN docker-php-ext-install pdo pdo_mysql pdo_sqlite mysqli
 
 # Enable Apache mod_rewrite for clean URLs
 RUN a2enmod rewrite
