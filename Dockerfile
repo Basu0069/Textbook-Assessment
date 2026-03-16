@@ -14,9 +14,12 @@ WORKDIR /var/www/html
 # Copy all project files into the container
 COPY . .
 
-# Give Apache proper permissions
+# Give Apache proper permissions and create writable SQLite database file
 RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html
+    && chmod -R 755 /var/www/html \
+    && touch /var/www/html/database.sqlite \
+    && chmod 666 /var/www/html/database.sqlite \
+    && chown www-data:www-data /var/www/html/database.sqlite
 
 # Expose port 80 (Apache default)
 EXPOSE 80
