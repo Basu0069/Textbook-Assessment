@@ -67,8 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 error_log("Session variables set - User ID: $userId, Name: $name");
                 
-                // Redirect to home page
-                header('Location: index.php');
+                // Redirect to home page using JS to bypass any output buffering issues
+                echo '<script>window.location.href = "index.php";</script>';
                 exit;
             }
         } catch (PDOException $e) {

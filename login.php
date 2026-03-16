@@ -21,7 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($user && password_verify($password, $user['password'])) {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['name'];
-                header('Location: index.php');
+                // Redirect to home page using JS to bypass any output buffering issues
+                echo '<script>window.location.href = "index.php";</script>';
                 exit;
             } else {
                 $error = 'Invalid email or password';
