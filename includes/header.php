@@ -1,5 +1,5 @@
 <?php
-ob_start(); // Start output buffering to prevent header already sent errors
+ob_start();
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
